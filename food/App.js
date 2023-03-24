@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 export default function App() {
   console.log();
+  console.log();
 
   return (
     <View style={styles.container}>
