@@ -1,32 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import SearchBar from '../components/SearchBar';
-import yelp from '../api/yelp';
+import useBusinesses from '../hooks/useBusinesses';
+import BusinessesList from '../components/BusinessesList';
 
-const SearchScreen = searchTerm => {
+const SearchScreen = () => {
   const [term, setTerm] = useState('');
-  const [businesses, setBusinesses] = useState([]);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [businesses, errorMessage, searchApi] = useBusinesses();
 
-  const searchApi = async () => {
-    try {
-      const responce = await yelp.get('/search', {
-        params: {
-          limit: 50,
-          term: searchTerm,
-          location: 'san jose',
-        },
-      });
-
-      setBusinesses(responce.data.businesses);
-    } catch (err) {
-      setErrorMessage('Something went wrong');
-    }
+  const filterBusinessesByPrice = price => {
+    return businesses.filter(business => business.price === price);
   };
-
-  useEffect(() => {
-    searchApi('pasta');
-  }, []);
 
   return (
     <View>
@@ -37,6 +21,18 @@ const SearchScreen = searchTerm => {
       />
       {errorMessage ? <Text>{errorMessage}</Text> : null}
       <Text>We have found {businesses.length} businesses</Text>
+      <BusinessesList
+        title="Cost Effective"
+        businesses={filterBusinessesByPrice('$')}
+      />
+      <BusinessesList
+        title="Big Pricier"
+        businesses={filterBusinessesByPrice('$$')}
+      />
+      <BusinessesList
+        title="Big Spender"
+        businesses={filterBusinessesByPrice('$$$')}
+      />
     </View>
   );
 };
